@@ -1,0 +1,65 @@
+name: IronCandle — Weekly Fundamentals Refresh
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 10:00 IST = 04:30 UTC on Saturday
+    - cron: "30 4 * * 6"
+
+concurrency:
+  group: ironcandle-fundamentals-refresh
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Restore market DB from Google Drive
+        env:
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+          GOOGLE_DRIVE_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
+          GOOGLE_DRIVE_FILENAME: iron_candle_market.db.gz
+        run: |
+          python scripts/drive_sync.py pull --local data/iron_candle_market.db.gz
+          python - <<'PY'
+          import gzip, shutil
+          with gzip.open('data/iron_candle_market.db.gz','rb') as src, open('data/iron_candle_market.db','wb') as dst:
+              shutil.copyfileobj(src,dst)
+          PY
+
+      - name: Refresh Screener public fundamentals
+        run: python scripts/refresh_fundamentals.py
+
+      - name: Archive compressed market DB to Google Drive
+        env:
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+          GOOGLE_DRIVE_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
+          GOOGLE_DRIVE_FILENAME: iron_candle_market.db.gz
+        run: python scripts/drive_sync.py push --local data/iron_candle_market.db.gz
+
+      - name: Publish updated scanner snapshot
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data/scanner.json
+          git diff --cached --quiet || git commit -m "chore: refresh IronCandle fundamentals"
+          git push

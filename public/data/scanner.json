@@ -1,0 +1,18 @@
+{
+  "demo": false,
+  "status": "NOT_BOOTSTRAPPED",
+  "generatedAt": null,
+  "asOf": null,
+  "source": "Production scanner awaiting first historical bootstrap and NSE EOD refresh.",
+  "meta": {
+    "universeCount": 500,
+    "processedCount": 0,
+    "fundamentalsProvider": "Screener public company pages",
+    "priceProvider": "NSE official UDiFF final bhavcopy",
+    "historyBootstrapProvider": "Yahoo Finance via yfinance (one-time only)",
+    "benchmark": "NIFTY 50",
+    "refreshSchedule": "Weekdays 18:30 IST",
+    "fundamentalRefreshSchedule": "Saturday 10:00 IST"
+  },
+  "rows": []
+}

@@ -1,0 +1,9 @@
+pandas>=2.2,<3
+requests>=2.32,<3
+beautifulsoup4>=4.12,<5
+yfinance>=0.2.66,<1
+# Google Drive backup / restore
+google-api-python-client>=2.170,<3
+google-auth>=2.40,<3
+google-auth-oauthlib>=1.2,<2
+google-auth-httplib2>=0.2,<1

@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IronCandle — Trading OS</title>
+  <meta name="description" content="Personal trading command center: NIFTY 500 breakout scanner, risk desk and trading journal." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <script>window.IRONCANDLE_CONFIG = window.IRONCANDLE_CONFIG || { supabaseUrl: "", supabaseAnonKey: "" };</script>
+  <script src="config.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">IC</div>
+        <div>
+          <div class="brand-name">IRONCANDLE</div>
+          <div class="brand-sub">TRADING OS</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <button class="nav-btn active" data-view="command"><span>⌂</span> Command Center</button>
+        <button class="nav-btn" data-view="scanner"><span>◈</span> Stock Scanner</button>
+        <button class="nav-btn" data-view="journal"><span>▤</span> Trading Journal</button>
+        <button class="nav-btn" data-view="risk"><span>⚡</span> Risk Desk</button>
+        <button class="nav-btn" data-view="analytics"><span>▥</span> Analytics</button>
+        <button class="nav-btn" data-view="settings"><span>⚙</span> Settings</button>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="small-label">DATA MODE</div>
+        <div class="data-mode" id="dataMode">LOCAL DEMO</div>
+        <div class="muted tiny">Market data refreshes via GitHub Actions. Cloud journal sync keeps your data available on every device.</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">TRADING COMMAND CENTER</div>
+          <h1 id="pageTitle">Good trading requires a repeatable process.</h1>
+        </div>
+        <div class="top-actions">
+          <div class="asof" id="marketAsOf">Market: not loaded</div>
+          <button class="ghost-btn" id="refreshScannerBtn">Refresh scanner</button>
+        </div>
+      </header>
+
+      <section class="view active" id="view-command"></section>
+      <section class="view" id="view-scanner"></section>
+      <section class="view" id="view-journal"></section>
+      <section class="view" id="view-risk"></section>
+      <section class="view" id="view-analytics"></section>
+      <section class="view" id="view-settings"></section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <div class="modal" id="tradeModal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <div class="eyebrow">LOG COMPLETED TRADE</div>
+          <h2>Trade journal entry</h2>
+        </div>
+        <button class="icon-btn" id="closeTradeModal">×</button>
+      </div>
+      <form id="tradeForm" class="form-grid">
+        <label>Entry date<input type="date" name="entry_date" required /></label>
+        <label>Exit date<input type="date" name="exit_date" required /></label>
+        <label>Symbol<input type="text" name="symbol" placeholder="RELIANCE" required /></label>
+        <label>Product / direction<select name="direction"><option>Long Delivery</option><option>Long Intraday</option><option>Short Intraday</option></select></label>
+        <label>Setup<input type="text" name="setup" placeholder="ATH breakout + EMA alignment" /></label>
+        <label>Timeframe<select name="timeframe"><option>Daily</option><option>Weekly</option><option>Monthly</option></select></label>
+        <label>Entry price (₹)<input type="number" name="entry_price" step="0.01" required /></label>
+        <label>Stop loss (₹)<input type="number" name="stop_price" step="0.01" required /></label>
+        <label>Target (₹)<input type="number" name="target_price" step="0.01" /></label>
+        <label>Exit price (₹)<input type="number" name="exit_price" step="0.01" required /></label>
+        <label>Quantity<input type="number" name="qty" min="1" step="1" required /></label>
+        <label>Broker<select name="broker"><option>Dhan</option><option>Zerodha</option><option>Custom</option></select></label>
+        <label class="span-2">Notes<textarea name="notes" rows="4" placeholder="Why entered? What happened? What did you learn?"></textarea></label>
+        <div class="trade-preview span-2" id="tradePreview"></div>
+        <div class="form-actions span-2">
+          <button type="button" class="ghost-btn" id="cancelTrade">Cancel</button>
+          <button class="primary-btn" type="submit">Save trade</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
